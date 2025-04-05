@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Honed\Page\PageRouter;
 use Honed\Page\Facades\Page;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Routing\Route as RoutingRoute;
 use Symfony\Component\HttpFoundation\Request;
 
 beforeEach(function () {
@@ -15,7 +13,6 @@ beforeEach(function () {
     Page::path($this->path);
     Page::flushExcept();
     Page::flushOnly();
-    Artisan::call('storage:link');
 });
 
 it('has path', function () {
@@ -47,81 +44,19 @@ it('has path', function () {
 it('creates routes', function () {
     Page::create();
 
-    $gets = Route::getRoutes()->get(Request::METHOD_GET);
+    ensureRoutesExist(registered(), Request::METHOD_GET);
 
-    // dd(($gets['products/variants'])->getName());
-
-    expect($gets)
-        ->toBeArray()
-        ->toHaveCount(\count(registered()) + 1) // The storage/{path} route
-        ->toHaveKeys(registered());
-
-    foreach (registered() as $route) {
-        expect($gets[$route])
-            ->toBeInstanceOf(RoutingRoute::class)
-            ->getAction()->scoped(fn ($action) => $action
-                ->toBeArray()
-                ->toHaveKey('uses')
-                ->{'uses'}->toBeInstanceOf(\Closure::class)
-            );
-    }
-
-    $heads = Route::getRoutes()->get(Request::METHOD_HEAD);
-
-    expect($heads)
-        ->toBeArray()
-        ->toHaveCount(\count(registered()) + 1) // The storage/{path} route
-        ->toHaveKeys(registered());
-
-    foreach (registered() as $route) {
-        expect($heads[$route])
-            ->toBeInstanceOf(RoutingRoute::class)
-            ->getAction()->scoped(fn ($action) => $action
-                ->toBeArray()
-                ->toHaveKey('uses')
-                ->{'uses'}->toBeInstanceOf(\Closure::class)
-            );
-    }
+    ensureRoutesExist(registered(), Request::METHOD_HEAD);
 });
 
 it('creates routes by subdirectory', function () {
     Page::create('Products');
 
-    $gets = Route::getRoutes()->get(Request::METHOD_GET);
-
-    $routes = \array_reduce(
-        registered(),
-        function ($routes, $route) {
-            if ($route !== '/') {
-                $new = \str_replace('products', '', $route);
-
-                if (empty($new)) {
-                    $new = '/';
-                } else {
-                    $new = ltrim($new, '/');
-                }
-
-                $routes[] = $new;
-            }
-
-            return $routes;
-        },
-        []
-    );
-
-    expect($gets)
-        ->toBeArray()
-        ->toHaveCount(\count($routes) + 1); // The storage/{path} route
-
-    foreach ($routes as $route) {
-        expect($gets[$route])
-            ->toBeInstanceOf(RoutingRoute::class)
-            ->getAction()->scoped(fn ($action) => $action
-                ->toBeArray()
-                ->toHaveKey('uses')
-                ->{'uses'}->toBeInstanceOf(\Closure::class)
-            );
-    }
+    ensureRoutesExist([
+        '/',
+        'all',
+        'variants',
+    ]);
 });
 
 it('fails if the directory does not exist', function () {
@@ -145,11 +80,15 @@ it('excludes patterns', function () {
 
     Page::create();
 
-    $gets = Route::getRoutes()->get(Request::METHOD_GET);
+    ensureRoutesExist([
+        'products/all'
+    ]);
 
-    expect($gets)
-        ->toBeArray()
-        ->toHaveCount(\count(registered()) + 1 - 3);
+    ensureRoutesDoNotExist([
+        '/',
+        'products',
+        'products/variants',
+    ]);
 });
 
 it('excludes all directories', function () {
@@ -157,19 +96,13 @@ it('excludes all directories', function () {
 
     Page::create();
 
-    $gets = Route::getRoutes()->get(Request::METHOD_GET);
+    ensureRoutesExist(['/']);
 
-    expect($gets)
-        ->toBeArray()
-        ->toHaveCount(1 + 1);
-
-    Page::create('Products');
-
-    $gets = Route::getRoutes()->get(Request::METHOD_GET);
-
-    expect($gets)
-        ->toBeArray()
-        ->toHaveCount(1 + 2);
+    ensureRoutesDoNotExist([
+        'products',
+        'products/all',
+        'products/variants',
+    ]);
 });
 
 it('excludes directories', function () {
@@ -177,11 +110,15 @@ it('excludes directories', function () {
 
     Page::create();
 
-    $gets = Route::getRoutes()->get(Request::METHOD_GET);
-    
-    expect($gets)
-        ->toBeArray()
-        ->toHaveCount(3 + 1);
+    ensureRoutesExist([
+        '/',
+        'products/all',
+        'products',
+    ]);
+
+    ensureRoutesDoNotExist([
+        'products/variants',
+    ]);
 });
 
 it('includes patterns', function () {
@@ -197,9 +134,13 @@ it('includes patterns', function () {
 
     Page::create();
 
-    $gets = Route::getRoutes()->get(Request::METHOD_GET);
+    ensureRoutesExist([
+        '/',
+        'products',
+        'products/variants',
+    ]);
 
-    expect($gets)
-        ->toBeArray()
-        ->toHaveCount(3 + 1);
+    ensureRoutesDoNotExist([
+        'products/all',
+    ]);
 });
