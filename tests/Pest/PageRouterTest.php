@@ -51,7 +51,7 @@ it('creates routes', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(\count(registered()) + 1) // The storage/{path} route
+        ->toHaveCount(\count(registered()))
         ->toHaveKeys(registered());
 
     foreach (registered() as $route) {
@@ -68,7 +68,7 @@ it('creates routes', function () {
 
     expect($heads)
         ->toBeArray()
-        ->toHaveCount(\count(registered()) + 1) // The storage/{path} route
+        ->toHaveCount(\count(registered()))
         ->toHaveKeys(registered());
 
     foreach (registered() as $route) {
@@ -109,7 +109,7 @@ it('creates routes by subdirectory', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(\count($routes) + 1); // The storage/{path} route
+        ->toHaveCount(\count($routes));
 
     foreach ($routes as $route) {
         expect($gets[$route])
@@ -147,7 +147,7 @@ it('excludes patterns', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(\count(registered()) + 1 - 3);
+        ->toHaveCount(\count(registered()) - 3);
 });
 
 it('excludes all directories', function () {
@@ -179,7 +179,7 @@ it('excludes directories', function () {
     
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(3 + 1);
+        ->toHaveCount(3);
 });
 
 it('includes patterns', function () {
@@ -199,5 +199,5 @@ it('includes patterns', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(3 + 1);
+        ->toHaveCount(3);
 });
