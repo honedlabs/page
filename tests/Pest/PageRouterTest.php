@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-use Honed\Page\Facades\Page;
 use Honed\Page\PageRouter;
-use Illuminate\Routing\Route as RoutingRoute;
+use Honed\Page\Facades\Page;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Routing\Route as RoutingRoute;
 use Symfony\Component\HttpFoundation\Request;
 
 beforeEach(function () {
@@ -14,6 +15,7 @@ beforeEach(function () {
     Page::path($this->path);
     Page::flushExcept();
     Page::flushOnly();
+    Artisan::call('storage:link');
 });
 
 it('has path', function () {
@@ -51,7 +53,7 @@ it('creates routes', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(\count(registered()))
+        ->toHaveCount(\count(registered()) + 1) // The storage/{path} route
         ->toHaveKeys(registered());
 
     foreach (registered() as $route) {
@@ -68,7 +70,7 @@ it('creates routes', function () {
 
     expect($heads)
         ->toBeArray()
-        ->toHaveCount(\count(registered()))
+        ->toHaveCount(\count(registered()) + 1) // The storage/{path} route
         ->toHaveKeys(registered());
 
     foreach (registered() as $route) {
@@ -109,7 +111,7 @@ it('creates routes by subdirectory', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(\count($routes));
+        ->toHaveCount(\count($routes) + 1); // The storage/{path} route
 
     foreach ($routes as $route) {
         expect($gets[$route])
@@ -147,7 +149,7 @@ it('excludes patterns', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(\count(registered()) - 3);
+        ->toHaveCount(\count(registered()) + 1 - 3);
 });
 
 it('excludes all directories', function () {
@@ -159,7 +161,7 @@ it('excludes all directories', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(1);
+        ->toHaveCount(1 + 1);
 
     Page::create('Products');
 
@@ -179,7 +181,7 @@ it('excludes directories', function () {
     
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(3);
+        ->toHaveCount(3 + 1);
 });
 
 it('includes patterns', function () {
@@ -199,5 +201,5 @@ it('includes patterns', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(3);
+        ->toHaveCount(3 + 1);
 });
