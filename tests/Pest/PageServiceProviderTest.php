@@ -18,5 +18,5 @@ it('registers router macro', function () {
 
     expect(Route::getRoutes()->get(Request::METHOD_GET))
         ->toBeArray()
-        ->toHaveCount(\count(registered()) + 1);
+        ->toHaveCount(\count(registered()));
 });

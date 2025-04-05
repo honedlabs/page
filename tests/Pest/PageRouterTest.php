@@ -159,7 +159,7 @@ it('excludes all directories', function () {
 
     expect($gets)
         ->toBeArray()
-        ->toHaveCount(1 + 1);
+        ->toHaveCount(1);
 
     Page::create('Products');
 
