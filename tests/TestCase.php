@@ -66,21 +66,6 @@ class TestCase extends Orchestra
     }
 
     /**
-     * Define the routes setup.
-     *
-     * @param  \Illuminate\Routing\Router  $router
-     * @return void
-     */
-    protected function defineRoutes($router)
-    {
-        $router->middleware([\Inertia\Middleware::class])
-            ->group(function ($router) {
-                // $router->get('/', fn () => inertia('Index'))
-                //     ->name('index');
-            });
-    }
-
-    /**
      * Define the environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
