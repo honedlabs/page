@@ -21,14 +21,14 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Honed\Page\PageRouter flushOnly() Clear inclusion patterns
  * @method static void create(?string $directory = null, string $uri = '/', string|false $name = 'pages') Register pages as routes
  *
- * @see \Honed\Page\PageRouter
+ * @see PageRouter
  */
 class Page extends Facade
 {
     /**
      * Get the root object behind the facade.
      *
-     * @return \Honed\Page\PageRouter
+     * @return PageRouter
      */
     public static function getFacadeRoot()
     {

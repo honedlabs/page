@@ -6,6 +6,13 @@ namespace Honed\Page;
 
 use Illuminate\Support\Str;
 
+use function array_map;
+use function explode;
+use function implode;
+use function pathinfo;
+use function rtrim;
+use function trim;
+
 class Page
 {
     /**
@@ -37,15 +44,15 @@ class Page
      */
     public function __construct($filename)
     {
-        $directory = \pathinfo($filename, PATHINFO_DIRNAME);
+        $directory = pathinfo($filename, PATHINFO_DIRNAME);
 
-        $this->name = \pathinfo($filename, PATHINFO_FILENAME);
+        $this->name = pathinfo($filename, PATHINFO_FILENAME);
 
-        $this->path = \trim(\rtrim($directory, './').'/'.$this->name, './');
+        $this->path = trim(rtrim($directory, './').'/'.$this->name, './');
 
-        $this->uri = \implode('/', \array_map(
+        $this->uri = implode('/', array_map(
             Str::kebab(...),
-            \explode('/', $this->path)
+            explode('/', $this->path)
         ));
     }
 
@@ -86,9 +93,9 @@ class Page
      */
     public function getRouteName()
     {
-        return \implode('.', \array_map(
+        return implode('.', array_map(
             Str::kebab(...),
-            \explode('/', $this->getPath())
+            explode('/', $this->getPath())
         ));
     }
 }

@@ -52,10 +52,11 @@ function ensureRoutesExist($pages = [], $method = Request::METHOD_GET)
     foreach ($pages as $page) {
         expect($routes[$page])
             ->toBeInstanceOf(Route::class)
-            ->getAction()->scoped(fn ($action) => $action
-            ->toBeArray()
-            ->toHaveKey('uses')
-            ->{'uses'}->toBeInstanceOf(\Closure::class)
+            ->getAction()
+            ->scoped(fn ($action) => $action
+                ->toBeArray()
+                ->toHaveKey('uses')
+                ->{'uses'}->toBeInstanceOf(Closure::class)
             );
     }
 }

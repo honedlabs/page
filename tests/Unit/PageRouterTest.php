@@ -61,18 +61,19 @@ it('creates routes by subdirectory', function () {
 
 it('fails if the directory does not exist', function () {
     Page::create('NonExistent');
-})->throws(\Error::class);
+})->throws(Error::class);
 
 it('fails if a file is provided', function () {
     Page::create('Index.vue');
-})->throws(\Error::class);
+})->throws(Error::class);
 
 it('excludes patterns', function () {
     expect(Page::getFacadeRoot())
         ->hasExcept()->toBeFalse()
-        ->getExcept()->scoped(fn ($except) => $except
-        ->toBeArray()
-        ->toBeEmpty()
+        ->getExcept()
+        ->scoped(fn ($except) => $except
+            ->toBeArray()
+            ->toBeEmpty()
         )
         ->except('Index')->toBeInstanceOf(PageRouter::class)
         ->hasExcept()->toBeTrue()
@@ -124,9 +125,10 @@ it('excludes directories', function () {
 it('includes patterns', function () {
     expect(Page::getFacadeRoot())
         ->hasOnly()->toBeFalse()
-        ->getOnly()->scoped(fn ($only) => $only
-        ->toBeArray()
-        ->toBeEmpty()
+        ->getOnly()
+        ->scoped(fn ($only) => $only
+            ->toBeArray()
+            ->toBeEmpty()
         )
         ->only('Index')->toBeInstanceOf(PageRouter::class)
         ->hasOnly()->toBeTrue()

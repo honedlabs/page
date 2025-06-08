@@ -33,6 +33,17 @@ class TestCase extends Orchestra
     }
 
     /**
+     * Define the environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    public function getEnvironmentSetUp($app)
+    {
+        config()->set('database.default', 'testing');
+    }
+
+    /**
      * Get the package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
@@ -63,16 +74,5 @@ class TestCase extends Orchestra
             $table->boolean('best_seller')->default(false);
             $table->timestamps();
         });
-    }
-
-    /**
-     * Define the environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    public function getEnvironmentSetUp($app)
-    {
-        config()->set('database.default', 'testing');
     }
 }

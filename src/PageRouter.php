@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Honed\Page;
 
+use Error;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -11,9 +12,18 @@ use Illuminate\Support\Str;
 use SplFileInfo;
 use Symfony\Component\HttpFoundation\Request;
 
+use function array_merge;
+use function array_reduce;
+use function in_array;
+use function mb_strtolower;
+use function rtrim;
+use function sprintf;
+use function str_starts_with;
+use function trim;
+
 class PageRouter
 {
-    const DEFAULT_PAGE_NAME = 'index'; // Case insensitive
+    public const DEFAULT_PAGE_NAME = 'index'; // Case insensitive
 
     /**
      * The path where the pages are located.
@@ -35,6 +45,24 @@ class PageRouter
      * @var array<int, string>
      */
     protected $only = [];
+
+    /**
+     * Throw an error if the given directory is not valid.
+     *
+     * @param  string  $directory
+     * @return never
+     *
+     * @throws Error
+     */
+    public static function throwInvalidDirectory($directory)
+    {
+        throw new Error(
+            sprintf(
+                'The directory [%s] is not valid.',
+                $directory
+            )
+        );
+    }
 
     /**
      * Set the path where your pages are located.
@@ -95,7 +123,7 @@ class PageRouter
     {
         $patterns = Arr::flatten($patterns);
 
-        $this->except = \array_merge($this->except, $patterns);
+        $this->except = array_merge($this->except, $patterns);
 
         return $this;
     }
@@ -144,7 +172,7 @@ class PageRouter
     {
         $patterns = Arr::flatten($patterns);
 
-        $this->only = \array_merge($this->only, $patterns);
+        $this->only = array_merge($this->only, $patterns);
 
         return $this;
     }
@@ -196,7 +224,7 @@ class PageRouter
         $uri = '/',
         $name = 'pages',
     ) {
-        $directory = \rtrim(\rtrim($this->getPath(), '/').'/'.\trim($directory ?? '', '/'), '/');
+        $directory = rtrim(rtrim($this->getPath(), '/').'/'.trim($directory ?? '', '/'), '/');
 
         if (! File::isDirectory($directory)) {
             static::throwInvalidDirectory($directory);
@@ -213,11 +241,11 @@ class PageRouter
      * Get all valid pages from the immediate given directory.
      *
      * @param  string  $directory
-     * @return array<int, \Honed\Page\Page>
+     * @return array<int, Page>
      */
     protected function getPages($directory)
     {
-        return \array_reduce(
+        return array_reduce(
             File::allFiles($directory),
             function (array $pages, SplFileInfo $file) {
                 if ($this->isValidPage($file)) {
@@ -243,9 +271,9 @@ class PageRouter
         return match (true) {
             ! $file->isFile(),
 
-            \str_starts_with($file->getFilename(), '_'),
+            str_starts_with($file->getFilename(), '_'),
 
-            filled($extensions) && ! \in_array($file->getExtension(), $extensions),
+            filled($extensions) && ! in_array($file->getExtension(), $extensions),
 
             $this->hasOnly() && ! $this->matchesOnly($file),
 
@@ -311,14 +339,14 @@ class PageRouter
     /**
      * Register the given page as a route.
      *
-     * @param  \Honed\Page\Page  $page
+     * @param  Page  $page
      * @param  string  $uri
      * @param  string|false  $name
      * @return void
      */
     protected function registerPage($page, $uri, $name)
     {
-        $pageUri = \trim($uri, '/').'/'.\trim($page->getUri(), '/');
+        $pageUri = trim($uri, '/').'/'.trim($page->getUri(), '/');
 
         $route = Route::match(
             [Request::METHOD_GET, Request::METHOD_HEAD],
@@ -328,7 +356,7 @@ class PageRouter
 
         if ($name) {
             $route->name(
-                \trim($name, '.').'.'.\trim($page->getRouteName(), '.')
+                trim($name, '.').'.'.trim($page->getRouteName(), '.')
             );
         }
     }
@@ -336,29 +364,11 @@ class PageRouter
     /**
      * Determine if the given page is the default page.
      *
-     * @param  \Honed\Page\Page  $page
+     * @param  Page  $page
      * @return bool
      */
     protected function isDefault($page)
     {
-        return \mb_strtolower($page->getName()) === static::DEFAULT_PAGE_NAME;
-    }
-
-    /**
-     * Throw an error if the given directory is not valid.
-     *
-     * @param  string  $directory
-     * @return never
-     *
-     * @throws \Error
-     */
-    public static function throwInvalidDirectory($directory)
-    {
-        throw new \Error(
-            \sprintf(
-                'The directory [%s] is not valid.',
-                $directory
-            )
-        );
+        return mb_strtolower($page->getName()) === static::DEFAULT_PAGE_NAME;
     }
 }
