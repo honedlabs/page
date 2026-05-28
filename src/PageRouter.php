@@ -15,11 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 use function array_merge;
 use function array_reduce;
 use function in_array;
+use function mb_rtrim;
 use function mb_strtolower;
-use function rtrim;
+use function mb_trim;
 use function sprintf;
 use function str_starts_with;
-use function trim;
 
 class PageRouter
 {
@@ -225,7 +225,7 @@ class PageRouter
         $uri = '/',
         $name = 'pages',
     ) {
-        $directory = rtrim(rtrim($this->getPath(), '/').'/'.trim($directory ?? '', '/'), '/');
+        $directory = mb_rtrim(mb_rtrim($this->getPath(), '/').'/'.mb_trim($directory ?? '', '/'), '/');
 
         if (! File::isDirectory($directory)) {
             static::throwInvalidDirectory($directory);
@@ -350,7 +350,7 @@ class PageRouter
      */
     protected function registerPage($page, $uri, $name)
     {
-        $pageUri = trim($uri, '/').'/'.trim($page->getUri(), '/');
+        $pageUri = mb_trim($uri, '/').'/'.mb_trim($page->getUri(), '/');
 
         $route = Route::match(
             [Request::METHOD_GET, Request::METHOD_HEAD],
@@ -360,7 +360,7 @@ class PageRouter
 
         if ($name) {
             $route->name(
-                trim($name, '.').'.'.trim($page->getRouteName(), '.')
+                mb_trim($name, '.').'.'.mb_trim($page->getRouteName(), '.')
             );
         }
     }
