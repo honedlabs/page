@@ -19,3 +19,9 @@ it('has nested page', function () {
         ->getUri()->toBe('products/product')
         ->getRouteName()->toBe('products.product');
 });
+
+it('normalizes windows directory separators', function () {
+    expect(new Page('Products\\Variants\\Index.vue'))
+        ->getPath()->toBe('Products/Variants/Index')
+        ->getUri()->toBe('products/variants/index');
+});

@@ -15,11 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 use function array_merge;
 use function array_reduce;
 use function in_array;
-use function mb_rtrim;
 use function mb_strtolower;
-use function mb_trim;
+use function rtrim;
 use function sprintf;
 use function str_starts_with;
+use function trim;
 
 class PageRouter
 {
@@ -92,7 +92,8 @@ class PageRouter
         }
 
         /** @var string|null */
-        $paths = config('inertia.testing.page_paths', null);
+        $paths = config('inertia.testing.page_paths')
+            ?? config('inertia.pages.paths');
 
         if ($paths) {
             return $paths;
@@ -224,7 +225,7 @@ class PageRouter
         $uri = '/',
         $name = 'pages',
     ) {
-        $directory = mb_rtrim(mb_rtrim($this->getPath(), '/').'/'.mb_trim($directory ?? '', '/'), '/');
+        $directory = rtrim(rtrim($this->getPath(), '/').'/'.trim($directory ?? '', '/'), '/');
 
         if (! File::isDirectory($directory)) {
             static::throwInvalidDirectory($directory);
@@ -266,7 +267,8 @@ class PageRouter
     protected function isValidPage($file)
     {
         /** @var array<int, string> */
-        $extensions = config('inertia.testing.page_extensions', []);
+        $extensions = config('inertia.testing.page_extensions')
+            ?? config('inertia.pages.extensions', []);
 
         return match (true) {
             ! $file->isFile(),
@@ -328,7 +330,9 @@ class PageRouter
 
         // Exclude specific directories
         if (Str::contains($pattern, '/')) {
-            return Str::is($pattern, $file->getRelativePathname());
+            $pathname = str_replace('\\', '/', $file->getRelativePathname());
+
+            return Str::is($pattern, $pathname);
         }
 
         $name = $file->getFilename();
@@ -346,7 +350,7 @@ class PageRouter
      */
     protected function registerPage($page, $uri, $name)
     {
-        $pageUri = mb_trim($uri, '/').'/'.mb_trim($page->getUri(), '/');
+        $pageUri = trim($uri, '/').'/'.trim($page->getUri(), '/');
 
         $route = Route::match(
             [Request::METHOD_GET, Request::METHOD_HEAD],
@@ -356,7 +360,7 @@ class PageRouter
 
         if ($name) {
             $route->name(
-                mb_trim($name, '.').'.'.mb_trim($page->getRouteName(), '.')
+                trim($name, '.').'.'.trim($page->getRouteName(), '.')
             );
         }
     }

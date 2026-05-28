@@ -25,7 +25,10 @@ it('has path', function () {
 
     // Should look at the inertia config if none exists
     expect($router)
-        ->getPath()->toBe(config('inertia.testing.page_paths'));
+        ->getPath()->toBe(
+            config('inertia.testing.page_paths')
+            ?? config('inertia.pages.paths')
+        );
 
     // Should default to the resource path if nothing else is found
     config()->set('inertia.testing.page_paths', null);
