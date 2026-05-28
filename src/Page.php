@@ -9,9 +9,9 @@ use Illuminate\Support\Str;
 use function array_map;
 use function explode;
 use function implode;
-use function mb_rtrim;
-use function mb_trim;
 use function pathinfo;
+use function rtrim;
+use function trim;
 
 class Page
 {
@@ -48,7 +48,7 @@ class Page
 
         $this->name = pathinfo($filename, PATHINFO_FILENAME);
 
-        $this->path = mb_trim(mb_rtrim($directory, './').'/'.$this->name, './');
+        $this->path = trim(rtrim($directory, './').'/'.$this->name, './');
 
         $this->uri = implode('/', array_map(
             Str::kebab(...),

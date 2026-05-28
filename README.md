@@ -9,6 +9,7 @@
 
 <p>
     <a href="https://github.com/honedlabs/page/actions"><img src="https://github.com/honedlabs/page/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>
+    <a href="https://github.com/honedlabs/page"><img src="https://raw.githubusercontent.com/honedlabs/page/main/badge-coverage.svg" alt="Code Coverage"></a>
     <a href="https://packagist.org/packages/honed/page"><img src="https://img.shields.io/packagist/dt/honed/page" alt="Total Downloads"></a>
     <a href="https://packagist.org/packages/honed/page"><img src="https://img.shields.io/packagist/v/honed/page" alt="Latest Stable Version"></a>
 </p>
@@ -17,9 +18,9 @@
 
 ## Installation
 
-> **Requires [PHP 8.2+](https://php.net/releases/)**
+> **Requires [PHP 8.3+](https://php.net/releases/)**
 
-> **Requires [Laravel 11+](https://laravel.com/docs/releases).**
+> **Requires [Laravel 12+](https://laravel.com/docs/releases).**
 
 > **Requires [Inertia.js 1.2+](https://inertiajs.com/server-side-setup)**
 
